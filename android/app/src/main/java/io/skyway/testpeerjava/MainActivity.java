@@ -144,9 +144,9 @@ public class MainActivity extends FragmentActivity
 				Context context = getActivity().getApplicationContext();
 
 				Intent intentParam = new Intent();
-//				intentParam.setClass(context, MapsActivity.class);
-				intentParam.setClass(context, MediaActivity.class);
-				intentParam.putExtra(OPTION_SERVER_TYPE, _iSelectedType);
+				intentParam.setClass(context, MapsActivity.class);
+//				intentParam.setClass(context, MediaActivity.class);
+//				intentParam.putExtra(OPTION_SERVER_TYPE, _iSelectedType);
 
 				startActivity(intentParam);
 			}

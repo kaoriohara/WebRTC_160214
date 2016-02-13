@@ -1,4 +1,4 @@
-package com.example.mmachi.mymapapplication;
+package io.skyway.testpeerjava;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
