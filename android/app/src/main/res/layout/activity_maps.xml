@@ -1,8 +1,119 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/map"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="io.skyway.testpeerjava.MapsActivity" />
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    android:background="#EDEDED"
+    tools:context="io.skyway.peer.testpeerjava.VideoChatActivity"
+    android:orientation="vertical">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:gravity="center"
+            android:id="@+id/tvOwnId"
+            android:layout_weight="1"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Calling"
+            android:id="@+id/btnAction"
+            android:enabled="false"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="3dp"
+            android:layout_height="3dp"
+            android:id="@+id/llPrimary">
+
+            <io.skyway.Peer.Browser.Canvas
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/svPrimary"/>
+
+        </LinearLayout>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1.0"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:id="@+id/llSecondary"
+            >
+
+            <io.skyway.Peer.Browser.Canvas
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/svSecondary"/>
+
+
+
+        </LinearLayout>
+
+        <Space
+            android:layout_width="20px"
+            android:layout_height="10px"
+            />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center|bottom">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Switch Camera"
+            android:id="@+id/switchCameraAction"
+            android:enabled="true" />
+    </LinearLayout>
+
+</LinearLayout>
