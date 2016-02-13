@@ -20,3 +20,15 @@ h1 {
 	right: 10px;
 	z-index: 10;
 }
+.wrapper{
+	width: 100%;
+	margin: 0 auto;
+}
+.tittle img {
+	text-align: center;
+	width: 80%;
+	margin: 0 auto;
+}
+body {
+	background-color: #8bc9d0;
+}

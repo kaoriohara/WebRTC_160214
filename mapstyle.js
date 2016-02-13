@@ -1,7 +1,7 @@
 function initialize() {
   var currentPos = new google.maps.LatLng(35.681735, 139.762651); /*現在地*/  
   var myOptions = {
-    zoom: 15, /*拡大比率*/
+    zoom: 17, /*拡大比率*/
     center: currentPos, /*表示枠内の中心点*/
     mapTypeControlOptions: { mapTypeIds: ['sample', google.maps.MapTypeId.ROADMAP] }/*表示タイプの指定*/
   };
