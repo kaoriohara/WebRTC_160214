@@ -1,0 +1,22 @@
+.smartphone-screen {
+background-color: #fff;
+width: 300px;
+}
+.pc-screen {
+  display: none;
+}
+h1 {
+	display: none;
+}
+.ID {
+	display: none;
+}
+.input-call-ID {
+	display: none;
+}
+.screen {
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
+	z-index: 10;
+}
