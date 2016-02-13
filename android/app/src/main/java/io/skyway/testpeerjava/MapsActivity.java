@@ -1,9 +1,6 @@
 package io.skyway.testpeerjava;
 
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -28,20 +25,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-
-        //システムサービスのLOCATION_SERVICEからLocationManager objectを取得
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        //retrieve providerへcriteria objectを生成
-        Criteria criteria = new Criteria();
-        //Best providerの名前を取得
-        String provider = locationManager.getBestProvider(criteria, true);
-//        //現在位置を取得
-//        Location location = locationManager.getLastKnownLocation(provider);
-//        if(location!=null){
-//            onLocationChanged(location);
-//        }
-//        locationManager.requestLocationUpdates(provider, 20000, 0, this);
     }
 
 
@@ -64,16 +47,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mMap.setTrafficEnabled(true);
 
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        // Add a marker in Tokyo and move the camera
+        LatLng tokyo = new LatLng(35.658581,139.745433);
+        mMap.addMarker(new MarkerOptions().position(tokyo).title("現在地"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(tokyo));
 
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location loc) {
                 LatLng curr = new LatLng(loc.getLatitude(), loc.getLongitude());
-                mMap.animateCamera(CameraUpdateFactory.newLatLng(curr));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(curr));
                 //Google Mapの Zoom値を指定
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
             }
