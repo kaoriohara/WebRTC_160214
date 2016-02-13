@@ -182,7 +182,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v)
             {
                 v.setEnabled(false);
-                stopRecord();
                 v.setEnabled(true);
             }
         });
@@ -206,57 +205,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 resultsString += results.get(i);
             }
 
+            Translate.setClientId("tad2016");
+            Translate.setClientSecret("n+c88QCb5WqsID86yHC0tFK5Wtr5vlBeXBxYTJRxn9k=");
+
+            String translatedText = null;
+
+            Toast.makeText(this, results.get(0), Toast.LENGTH_SHORT).show();
+            try {
+                translatedText = Translate.execute(results.get(0), Language.JAPANESE, Language.ENGLISH);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+//            Log.d("VOICE", translatedText);
             // トーストを使って結果を表示
-            Toast.makeText(this, resultsString, Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, resultsString, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, translatedText, Toast.LENGTH_LONG).show();
         }
 
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     private static final int REQUEST_CODE = 0;
-    private MediaRecorder mediarecorder; //録音用のメディアレコーダークラス
-    static final String filePath = "/sdcard/sampleWav.wav"; //録音用のファイルパス
 
-    private void startMediaRecord(){
-        try{
-            File mediafile = new File(filePath);
-            if(mediafile.exists()) {
-                //ファイルが存在する場合は削除する
-                mediafile.delete();
-            }
-            mediafile = null;
-            mediarecorder = new MediaRecorder();
-            //マイクからの音声を録音する
-            mediarecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            //ファイルへの出力フォーマット DEFAULTにするとwavが扱えるはず
-            mediarecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-            //音声のエンコーダーも合わせてdefaultにする
-            mediarecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-            //ファイルの保存先を指定
-            mediarecorder.setOutputFile(filePath);
-            //録音の準備をする
-            mediarecorder.prepare();
-            //録音開始
-            mediarecorder.start();
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    //停止
-    private void stopRecord(){
-        if(mediarecorder == null){
-            Toast.makeText(MapsActivity.this, "mediarecorder = null", Toast.LENGTH_SHORT).show();
-        }else{
-            try{
-                //録音停止
-                mediarecorder.stop();
-                mediarecorder.reset();
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-    }
     /**
      * Media connecting to remote peer.
      * @param strPeerId Remote peer.
