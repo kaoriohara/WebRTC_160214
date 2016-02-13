@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -30,6 +31,13 @@ import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import io.skyway.Peer.Browser.Canvas;
@@ -250,7 +258,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                             try {
-                                url = Speak.execute(translatedText, SpokenDialect.JAPANESE_JAPAN);
+                                url = Speak.execute(translatedText, SpokenDialect.ENGLISH_UNITED_KINGDOM);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -259,7 +267,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                         @Override
                         protected void onPostExecute(Void result){
-                            Log.d("VOICE", url);
+//                            Log.d("VOICE", url);
+                            //リソースファイルから再生
+
+                            MediaPlayer mediaPlayer = new MediaPlayer();
+                            try {
+                                mediaPlayer.setDataSource(url);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                                @Override
+                                public void onPrepared(MediaPlayer mp) {
+                                    mp.start();
+                                }
+                            });
+                            mediaPlayer.prepareAsync();
+
                         }
                     };
                     task2.execute();

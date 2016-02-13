@@ -26,58 +26,40 @@ public class HttpResponsAsync extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        // doInBackground‘Oˆ—
+        // doInBackgroundå‰å‡¦ç†
     }
 
     @Override
     protected String doInBackground(Void... params) {
+        HttpURLConnection con = null;
+        URL url = null;
+        String urlSt = "http://sample.jp";
 
-        Translate.setClientId("tad2016");
-        Translate.setClientSecret("n+c88QCb5WqsID86yHC0tFK5Wtr5vlBeXBxYTJRxn9k=");
-        Speak.setClientId("tad2016");
-        Speak.setClientSecret("n+c88QCb5WqsID86yHC0tFK5Wtr5vlBeXBxYTJRxn9k=");
-
-        String translatedText = null;
-
-//        Toast.makeText(this, results.get(0), Toast.LENGTH_SHORT).show();
         try {
-//            translatedText = Translate.execute(results.get(0), Language.JAPANESE, Language.ENGLISH);
-//            translatedText = Speak.execute(results.get(0), SpokenDialect.JAPANESE_JAPAN);
-        } catch (Exception e) {
+            // URLã®ä½œæˆ
+            url = new URL(urlSt);
+            // æ¥ç¶šç”¨HttpURLConnectionã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆä½œæˆ
+            con = (HttpURLConnection)url.openConnection();
+            // ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰ã®è¨­å®š
+            con.setRequestMethod("POST");
+            // ãƒªãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆã‚’è‡ªå‹•ã§è¨±å¯ã—ãªã„è¨­å®š
+            con.setInstanceFollowRedirects(false);
+            // URLæ¥ç¶šã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿å–ã‚‹å ´åˆã¯true
+            con.setDoInput(true);
+            // URLæ¥ç¶šã«ãƒ‡ãƒ¼ã‚¿ã‚’æ›¸ãè¾¼ã‚€å ´åˆã¯true
+            con.setDoOutput(true);
+
+            // æ¥ç¶š
+            con.connect();
+            // æœ¬æ–‡ã®å–å¾—
+            InputStream in = con.getInputStream();
+            String readSt = readInputStream(in);
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-
-        Log.d("VOICE", translatedText);
-
-//        HttpURLConnection con = null;
-//        URL url = null;
-//        String urlSt = "http://sample.jp";
-//
-//        try {
-//            // URL‚Ìì¬
-//            url = new URL(urlSt);
-//            // Ú‘±—pHttpURLConnectionƒIƒuƒWƒFƒNƒgì¬
-//            con = (HttpURLConnection)url.openConnection();
-//            // ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh‚Ìİ’è
-//            con.setRequestMethod("POST");
-//            // ƒŠƒ_ƒCƒŒƒNƒg‚ğ©“®‚Å‹–‰Â‚µ‚È‚¢İ’è
-//            con.setInstanceFollowRedirects(false);
-//            // URLÚ‘±‚©‚çƒf[ƒ^‚ğ“Ç‚İæ‚éê‡‚Ítrue
-//            con.setDoInput(true);
-//            // URLÚ‘±‚Éƒf[ƒ^‚ğ‘‚«‚Şê‡‚Ítrue
-//            con.setDoOutput(true);
-//
-//            // Ú‘±
-//            con.connect();
-//            // –{•¶‚Ìæ“¾
-//            InputStream in = con.getInputStream();
-//            String readSt = readInputStream(in);
-//
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
         return null;
     }
@@ -105,7 +87,7 @@ public class HttpResponsAsync extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        // doInBackgroundŒãˆ—
+        // doInBackgroundå¾Œå‡¦ç†
     }
 
 }
