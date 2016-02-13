@@ -2,6 +2,7 @@ package io.skyway.testpeerjava;
 
 import android.content.Context;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.FragmentActivity;
@@ -36,6 +37,8 @@ import io.skyway.Peer.PeerOption;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+//    private LocationSourceImpl mLocationSource = null;
+    private boolean mDoFollow = true;
 
     private static final String TAG = MapsActivity.class.getSimpleName();
 
@@ -60,6 +63,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
 
         _handler = new Handler(Looper.getMainLooper());
         Context context = getApplicationContext();
@@ -129,22 +133,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         //
-        Button switchCameraAction = (Button)findViewById(R.id.switchCameraAction);
-        switchCameraAction.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Boolean result = _msLocal.switchCamera();
-                if(true == result)
-                {
-                    //Success
-                }else
-                {
-                    //Failed
-                }
-            }
-        });
+//        Button switchCameraAction = (Button)findViewById(R.id.switchCameraAction);
+//        switchCameraAction.setOnClickListener(new View.OnClickListener()
+//        {
+//            @Override
+//            public void onClick(View v)
+//            {
+//                Boolean result = _msLocal.switchCamera();
+//                if(true == result)
+//                {
+//                    //Success
+//                }else
+//                {
+//                    //Failed
+//                }
+//            }
+//        });
+        _msLocal.switchCamera();
     }
 
     /**
@@ -566,8 +571,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Add a marker in Tokyo and move the camera
         LatLng tokyo = new LatLng(35.658581,139.745433);
-        mMap.addMarker(new MarkerOptions().position(tokyo).title("現在地"));
+//        mMap.addMarker(new MarkerOptions().position(tokyo).title("現在地"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(tokyo));
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
 
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override

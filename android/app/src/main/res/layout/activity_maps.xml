@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
     android:background="#EDEDED"
     tools:context="io.skyway.peer.testpeerjava.VideoChatActivity"
     android:orientation="vertical">
@@ -103,17 +102,6 @@
             android:layout_height="10px"
             />
 
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center|bottom">
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Switch Camera"
-            android:id="@+id/switchCameraAction"
-            android:enabled="true" />
     </LinearLayout>
 
 </LinearLayout>
