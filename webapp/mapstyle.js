@@ -9,7 +9,7 @@ function initialize() {
   
   /*アイコン設定(今ココ)*/
   var iconImakoko = new google.maps.MarkerImage('img/ico.png',
-    new google.maps.Size(55,72), /*アイコンサイズ設定*/
+    new google.maps.Size(100,100), /*アイコンサイズ設定*/
     new google.maps.Point(0,0) /*アイコン位置設定*/
     );
   

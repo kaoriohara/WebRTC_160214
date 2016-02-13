@@ -1,5 +1,4 @@
 .smartphone-screen {
-background-color: #fff;
 width: 300px;
 }
 .pc-screen {
@@ -30,5 +29,5 @@ h1 {
 	margin: 0 auto;
 }
 body {
-	background-color: #8bc9d0;
+	background: #99cc33 url(img/bg.jpg) no-repeat;
 }
