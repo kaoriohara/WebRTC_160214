@@ -1,10 +1,14 @@
 package io.skyway.testpeerjava;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.Looper;
+import android.speech.RecognizerIntent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -12,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,6 +26,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
+
+import java.io.File;
+import java.util.ArrayList;
 
 import io.skyway.Peer.Browser.Canvas;
 import io.skyway.Peer.Browser.MediaConstraints;
@@ -33,6 +41,8 @@ import io.skyway.Peer.Peer;
 import io.skyway.Peer.PeerError;
 import io.skyway.Peer.PeerOption;
 
+import com.memetix.mst.language.Language;
+import com.memetix.mst.translate.Translate;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -132,26 +142,121 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        //
-//        Button switchCameraAction = (Button)findViewById(R.id.switchCameraAction);
-//        switchCameraAction.setOnClickListener(new View.OnClickListener()
-//        {
-//            @Override
-//            public void onClick(View v)
-//            {
-//                Boolean result = _msLocal.switchCamera();
-//                if(true == result)
-//                {
-//                    //Success
-//                }else
-//                {
-//                    //Failed
-//                }
-//            }
-//        });
+        Button btnVoice = (Button) findViewById(R.id.btnVoice);
+        btnVoice.setEnabled(true);
+        btnVoice.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+//                v.setEnabled(false);
+//                startMediaRecord();
+//                v.setEnabled(true);
+                try {
+                    // インテント作成
+                    Intent intent = new Intent(
+                            RecognizerIntent.ACTION_RECOGNIZE_SPEECH); // ACTION_WEB_SEARCH
+                    intent.putExtra(
+                            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                    intent.putExtra(
+                            RecognizerIntent.EXTRA_PROMPT,
+                            "VoiceRecognitionTest"); // お好きな文字に変更できます
+
+                    // インテント発行
+                    startActivityForResult(intent, REQUEST_CODE);
+                } catch (ActivityNotFoundException e) {
+                    // このインテントに応答できるアクティビティがインストールされていない場合
+//                    Toast.makeText(VoiceRecognitionTestActivity.this,
+//                            "ActivityNotFoundException", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+
+        Button btnVoiceStop = (Button) findViewById(R.id.btnVoiceStop);
+        btnVoiceStop.setEnabled(true);
+        btnVoiceStop.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                v.setEnabled(false);
+                stopRecord();
+                v.setEnabled(true);
+            }
+        });
+
         _msLocal.switchCamera();
     }
 
+    // アクティビティ終了時に呼び出される
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // 自分が投げたインテントであれば応答する
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+            String resultsString = "";
+
+            // 結果文字列リスト
+            ArrayList<String> results = data.getStringArrayListExtra(
+                    RecognizerIntent.EXTRA_RESULTS);
+
+            for (int i = 0; i< results.size(); i++) {
+                // ここでは、文字列が複数あった場合に結合しています
+                resultsString += results.get(i);
+            }
+
+            // トーストを使って結果を表示
+            Toast.makeText(this, resultsString, Toast.LENGTH_LONG).show();
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private static final int REQUEST_CODE = 0;
+    private MediaRecorder mediarecorder; //録音用のメディアレコーダークラス
+    static final String filePath = "/sdcard/sampleWav.wav"; //録音用のファイルパス
+
+    private void startMediaRecord(){
+        try{
+            File mediafile = new File(filePath);
+            if(mediafile.exists()) {
+                //ファイルが存在する場合は削除する
+                mediafile.delete();
+            }
+            mediafile = null;
+            mediarecorder = new MediaRecorder();
+            //マイクからの音声を録音する
+            mediarecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            //ファイルへの出力フォーマット DEFAULTにするとwavが扱えるはず
+            mediarecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+            //音声のエンコーダーも合わせてdefaultにする
+            mediarecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+            //ファイルの保存先を指定
+            mediarecorder.setOutputFile(filePath);
+            //録音の準備をする
+            mediarecorder.prepare();
+            //録音開始
+            mediarecorder.start();
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    //停止
+    private void stopRecord(){
+        if(mediarecorder == null){
+            Toast.makeText(MapsActivity.this, "mediarecorder = null", Toast.LENGTH_SHORT).show();
+        }else{
+            try{
+                //録音停止
+                mediarecorder.stop();
+                mediarecorder.reset();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
     /**
      * Media connecting to remote peer.
      * @param strPeerId Remote peer.
