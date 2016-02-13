@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.MediaRecorder;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.speech.RecognizerIntent;
@@ -25,6 +26,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 
 import java.io.File;
@@ -42,6 +44,8 @@ import io.skyway.Peer.PeerError;
 import io.skyway.Peer.PeerOption;
 
 import com.memetix.mst.language.Language;
+import com.memetix.mst.language.SpokenDialect;
+import com.memetix.mst.speak.Speak;
 import com.memetix.mst.translate.Translate;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -64,11 +68,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String[] _listPeerIds;
     private boolean  _bCalling;
 
+    private HttpResponsAsync task_;
+    private String res;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+//        HttpResponsAsync task_ = new HttpResponsAsync(this, "test", "test");
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -205,22 +214,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 resultsString += results.get(i);
             }
 
-            Translate.setClientId("tad2016");
-            Translate.setClientSecret("n+c88QCb5WqsID86yHC0tFK5Wtr5vlBeXBxYTJRxn9k=");
+            res = results.get(0);
 
-            String translatedText = null;
+            AsyncTask<Void, Void, Void> task1 = new AsyncTask<Void, Void, Void>(){
+                String translatedText = null;
+                @Override
+                protected Void doInBackground(Void... params) {
 
-            Toast.makeText(this, results.get(0), Toast.LENGTH_SHORT).show();
-            try {
-                translatedText = Translate.execute(results.get(0), Language.JAPANESE, Language.ENGLISH);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                    Translate.setClientId("tad2016");
+                    Translate.setClientSecret("n+c88QCb5WqsID86yHC0tFK5Wtr5vlBeXBxYTJRxn9k=");
 
-//            Log.d("VOICE", translatedText);
+
+
+                    try {
+                        translatedText = Translate.execute(res, Language.JAPANESE, Language.ENGLISH);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+
+
+                    return null;
+                }
+                @Override
+                protected void onPostExecute(Void result){
+                    Log.d("VOICE", translatedText);
+
+                    AsyncTask<Void, Void, Void> task2 = new AsyncTask<Void, Void, Void>(){
+                        String url = null;
+                        @Override
+                        protected Void doInBackground(Void... params) {
+
+                            Speak.setClientId("tad2016");
+                            Speak.setClientSecret("n+c88QCb5WqsID86yHC0tFK5Wtr5vlBeXBxYTJRxn9k=");
+
+
+                            try {
+                                url = Speak.execute(translatedText, SpokenDialect.JAPANESE_JAPAN);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                            return null;
+                        }
+                        @Override
+                        protected void onPostExecute(Void result){
+                            Log.d("VOICE", url);
+                        }
+                    };
+                    task2.execute();
+                }
+            };
+            task1.execute();
+
+
+
+
             // トーストを使って結果を表示
-//            Toast.makeText(this, resultsString, Toast.LENGTH_LONG).show();
-            Toast.makeText(this, translatedText, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, resultsString, Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, translatedText, Toast.LENGTH_LONG).show();
         }
 
         super.onActivityResult(requestCode, resultCode, data);
