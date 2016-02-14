@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.*;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.Fragment;
@@ -156,24 +157,35 @@ public class MainActivity extends FragmentActivity
 			}
 		}
 
-		private void startChat()
-		{
-
+		private void startChat() {
+//			open_browser ();
 			try
 			{
 				Context context =  getActivity().getApplicationContext();
 
 				Intent intentParam = new Intent();
-				intentParam.setClass(context, DataActivity.class);
-				intentParam.putExtra(OPTION_SERVER_TYPE, _iSelectedType);
+				intentParam.setClass(context, MatrixActivity.class);
+//				intentParam.setClass(context, DataActivity.class);
+//				intentParam.putExtra(OPTION_SERVER_TYPE, _iSelectedType);
 
 				startActivity(intentParam);
+
+
 			}
 			catch (Exception exc)
 			{
 
 			}
 		}
+        public void open_browser () {
+            String base = "URL"; //URLの文字列
+            Uri uri = Uri.parse(base);//URIにParse
+            Intent i = new Intent(Intent.ACTION_VIEW, uri);
+            i.setClassName("com.android.browser", "com.android.browser.BrowserActivity");
+            //androidの標準ブラウザのクラスをセット
+            startActivity(i);//明示的インテントでアクティビティの起動
+        }
+
 
 	}
 }
