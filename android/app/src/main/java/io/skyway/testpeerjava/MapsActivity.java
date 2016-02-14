@@ -27,18 +27,38 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.skyway.Peer.Browser.Canvas;
 import io.skyway.Peer.Browser.MediaConstraints;
@@ -55,6 +75,11 @@ import com.memetix.mst.language.Language;
 import com.memetix.mst.language.SpokenDialect;
 import com.memetix.mst.speak.Speak;
 import com.memetix.mst.translate.Translate;
+
+import javax.net.ssl.SSLContext;
+//import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -208,6 +233,66 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void sendGeo() {
         LatLng tokyo = new LatLng(35.658581,139.745433);
 
+        AsyncTask<Void, Void, Void> task0 = new AsyncTask<Void, Void, Void>() {
+            String translatedText = null;
+            HttpResponse response = null;
+            @Override
+            protected Void doInBackground(Void... paramss) {
+
+                HttpURLConnection con = null;
+//                URL url = null;
+                String urlSt = "https://20151121ubuntu.cloudapp.net:8448/_matrix/client/api/v1/rooms/!kMPhYGcwRkJvDklDdp:20151121ubuntu.cloudapp.net/send/m.room.message?access_token=MDAyOWxvY2F0aW9uIDIwMTUxMTIxdWJ1bnR1LmNsb3VkYXBwLm5ldAowMDEzaWRlbnRpZmllciBrZXkKMDAxMGNpZCBnZW4gPSAxCjAwM2ZjaWQgdXNlcl9pZCA9IEB0YWRoYWNrMjAxNnRlc3Q6MjAxNTExMjF1YnVudHUuY2xvdWRhcHAubmV0CjAwMTZjaWQgdHlwZSA9IGFjY2VzcwowMDFkY2lkIHRpbWUgPCAxNDU1NDI2NDI4NjY3CjAwMmZzaWduYXR1cmUgxr3YWKsR6zD0M_JqHz5FIyb_0O24r5HRmr0krYH3wHQK";
+
+                Map<String, Object> jsonValues = new HashMap<>();
+                jsonValues.put("msgtype", "m.text");
+                jsonValues.put("body", "100");
+                JSONObject json = new JSONObject(jsonValues);
+
+
+                HttpParams params = new BasicHttpParams();
+                SchemeRegistry registry = new SchemeRegistry();
+                registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+                SSLSocketFactory sslSocketFactory = SSLSocketFactory.getSocketFactory();
+                // ホスト名の検証を行わない。
+                sslSocketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+                registry.register(new Scheme("https", sslSocketFactory, 443));
+                registry.register(new Scheme("https", sslSocketFactory, 8448));
+                ThreadSafeClientConnManager clientConnManager = new ThreadSafeClientConnManager(params, registry);
+//                HttpClient httpClient = new DefaultHttpClient(clientConnManager , params);
+                DefaultHttpClient client = new DefaultHttpClient(clientConnManager , params);
+
+                HttpPost post = new HttpPost(urlSt);
+
+                AbstractHttpEntity entity = null;
+                try {
+                    entity = new ByteArrayEntity(json.toString().getBytes("UTF8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                entity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+                post.setEntity(entity);
+                try {
+                    response = client.execute(post);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Log.d("VOICE", urlSt);
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+//                Log.d("VOICE", retText);
+                if (response != null) {
+                    Log.d("VOICE", response.toString());
+                } else {
+                    Log.d("VOICE", "null!!!");
+                }
+            }
+        };
+        task0.execute();
     }
 
     // アクティビティ終了時に呼び出される
