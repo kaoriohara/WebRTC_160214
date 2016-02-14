@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+<meta name="keywords" content="">
+<meta name="description" content="サイト全体の説明文を入力してください。">
+<title>駅doko　現在地から駅検索</title>
+<link rel="stylesheet" type="text/css" href="style.css" media="screen">
+<!-- ▼ファビコン設置箇所▼
+※ファビコンを使用する際はコメントアウトを消してください。-->
+<!-- /<link rel="shortcut icon" href="icon URL.ico"> -->
+<!-- ▲ファビコン設置箇所▲ -->
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+<!-- <script type="text/javascript" src="js/jquery.bxSlider.min.js"></script> -->
+<script type="text/javascript" src="js/mapstyle.js"></script>
+
+<!--<script type="text/javascript">
+// 
+// $(function(){
+// 	$("#slide").bxSlider({
+// 		auto: true,
+// 		speed: 800,
+// 		pause: 5000
+// 	});
+
+// 	$(".bx-prev").text("<");
+// 	$(".bx-next").text(">");
+
+// //フッターのアイコン付きメニューを
+// //中央寄せにしています。
+// //ここを消すと左よりになります。
+// 	var Liwidth = $(".foot_nav ul li");
+// 	for(i=0; i<= Liwidth.length; i++){
+// 		$(".foot_nav ul").width(Liwidth.width()*i+(2*i)-2)
+// 	};
+// });
+// 
+// </script>-->
+<!-- geolocation設定 -->
+<script>
+//成功した時の関数
+function successFunc(position){
+	//緯度をアラート表示
+	alert(position.coords.latitude);
+
+	//経度をアラート表示
+	alert(position.coords.longitude);
+	}
+
+//失敗した時の関数
+function errorFunc(error){
+	//エラーコードのメッセージを定義
+	var errorMessage = {
+		0: "原因不明のエラーが発生しました…。",
+		1: "位置情報の取得が許可されませんでした…。",
+		2: "電波状況などで位置情報が取得できませんでした…。",
+		3: "位置情報の取得に時間がかかり過ぎてタイムアウトしました…。",
+	};
+
+	//エラーコードに合わせたエラー内容を表示
+	alert(errorMessage[error.code]);
+}
+
+//オプション・オブジェクト
+var optionObj = {
+	"enableHighAccuracy": false,
+	"timeout": 8000,
+	"maximumAge": 5000,
+};
+
+//現在位置を取得する
+navigator.geolocation.getCurrentPosition(successFunc,errorFunc,optionObj);
+</script>
+<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js?ver=1.8.3"></script>
+<!--[if IE]>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<![endif]-->
+<!--[if lt IE 9]>
+<script src="http://cdn.liginc.co.jp/demo/2013/12/mapstyle/js/html5shiv-printshiv.js"></script>
+<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+<![endif]-->
+</head>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js?ver=1.8.3"></script>
+<!--[if IE]>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<![endif]-->
+<!--[if lt IE 9]>
+<script src="http://cdn.liginc.co.jp/demo/2013/12/mapstyle/js/html5shiv-printshiv.js"></script>
+<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+<![endif]-->
+<!-- <link rel="shortcut icon" href="http://cdn.liginc.co.jp/demo/2013/12/mapstyle/faviconURL">
+<link rel="apple-touch-icon" href="http://cdn.liginc.co.jp/demo/2013/12/mapstyle/WebClipIconURL">
+ -->
+<link href="default.css" rel="stylesheet" media="all">
+<!-- <script src="http://maps.google.com/maps/api/js?sensor=true"></script> -->
+<!-- <script src="mapstyle.js"></script> -->
+</head>
+<body onload="initialize();">
+<!-- <header> -->
+
+	<!-- メニューここから -->
+	<!-- <div id="menu">
+	<nav> -->
+		<!-- <li><a href="about.html"><img src="img/icon/icon1.png" width="28" height="28" alt="About">About</a></li>
+		<li><a href="free.html"><img src="img/icon/icon2.png" width="28" height="28" alt="Free">Free</a></li>
+		<li><a href="free.html"><img src="img/icon/icon3.png" width="28" height="28" alt="Free">Free</a></li>
+		<li><a href="mailto:メールアドレス＠"><img src="img/icon/icon4.png" width="28" height="28" alt="Contact">Contact</a></li> -->
+	<!-- </nav>
+	</div> -->
+	<!-- /メニューここまで -->
+	
+<!-- 	<h1>駅doko.com</h1>
+	<p class="head_des">現在地より最寄駅検索</p> -->
+
+<!-- </header> -->
+
+<div id="map_canvas" style="width:100%;height:500px;"></div>
+
+<!-- フッタここから -->
+<footer>
+
+	<!-- コピーライトここから -->
+<!-- 	<div id="copy">
+	Copyright© <a href="あなたのサイトURL">駅doko.com</a>, All rights reserved.<br>
+	</div> --><!-- /コピーライトここまで -->
+
+</footer><!-- /フッタここまで -->
+
+</body>
+</html>
