@@ -166,9 +166,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v)
             {
-//                v.setEnabled(false);
-//                startMediaRecord();
-//                v.setEnabled(true);
+
                 try {
                     // インテント作成
                     Intent intent = new Intent(
@@ -199,11 +197,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v)
             {
                 v.setEnabled(false);
+                sendGeo();
                 v.setEnabled(true);
             }
         });
 
         _msLocal.switchCamera();
+    }
+
+    private void sendGeo() {
+        LatLng tokyo = new LatLng(35.658581,139.745433);
+
     }
 
     // アクティビティ終了時に呼び出される
@@ -290,8 +294,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             };
             task1.execute();
-
-
 
 
             // トーストを使って結果を表示

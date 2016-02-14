@@ -88,7 +88,7 @@ public class MainActivity extends FragmentActivity
 		private final int[] _buttons =
 				{
 						R.id.btn_video,
-						R.id.btn_data,
+//						R.id.btn_data,
 				};
 
 		private int _iSelectedType;
@@ -112,7 +112,7 @@ public class MainActivity extends FragmentActivity
 				Button btn = (Button) rootView.findViewById(iId);
 				btn.setOnClickListener(this);
 
-				if ((R.id.btn_data == iId) || (R.id.btn_video == iId))
+				if (R.id.btn_video == iId)
 				{
 					continue;
 				}
@@ -130,10 +130,10 @@ public class MainActivity extends FragmentActivity
 			{
 				startVideoChat();
 			}
-			else if (R.id.btn_data == iId)
-			{
-				startChat();
-			}
+//			else if (R.id.btn_data == iId)
+//			{
+//				startChat();
+//			}
 		}
 
 
