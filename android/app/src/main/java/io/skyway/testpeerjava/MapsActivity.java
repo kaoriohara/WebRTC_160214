@@ -14,6 +14,7 @@ import android.speech.RecognizerIntent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.util.AndroidRuntimeException;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -28,11 +29,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.apache.http.HttpResponse;
+//import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
+//import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -53,8 +59,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,8 +84,11 @@ import com.memetix.mst.language.SpokenDialect;
 import com.memetix.mst.speak.Speak;
 import com.memetix.mst.translate.Translate;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 //import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -101,7 +112,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String[] _listPeerIds;
     private boolean  _bCalling;
 
-    private HttpResponsAsync task_;
+    private static final int REQUEST_CODE = 0;
     private String res;
 
     @Override
@@ -109,13 +120,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-//        HttpResponsAsync task_ = new HttpResponsAsync(this, "test", "test");
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
 
         _handler = new Handler(Looper.getMainLooper());
         Context context = getApplicationContext();
@@ -131,9 +139,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Enter your registered Domain.
         options.domain = "Android";
 
-
         // SKWPeer has many options. Please check the document. >> http://nttcom.github.io/skyway/docs/
-
         _peer = new Peer(context, options);
         setPeerCallback(_peer);
 
@@ -201,7 +207,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
                     intent.putExtra(
                             RecognizerIntent.EXTRA_PROMPT,
-                            "VoiceRecognitionTest"); // お好きな文字に変更できます
+                            "Translation"); // お好きな文字に変更できます
 
                     // インテント発行
                     startActivityForResult(intent, REQUEST_CODE);
@@ -234,7 +240,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng tokyo = new LatLng(35.658581,139.745433);
 
         AsyncTask<Void, Void, Void> task0 = new AsyncTask<Void, Void, Void>() {
-            String translatedText = null;
             HttpResponse response = null;
             @Override
             protected Void doInBackground(Void... paramss) {
@@ -248,18 +253,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 jsonValues.put("body", "100");
                 JSONObject json = new JSONObject(jsonValues);
 
+                DefaultHttpClient httpClient = new DefaultHttpClient();
 
-                HttpParams params = new BasicHttpParams();
-                SchemeRegistry registry = new SchemeRegistry();
-                registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-                SSLSocketFactory sslSocketFactory = SSLSocketFactory.getSocketFactory();
-                // ホスト名の検証を行わない。
-                sslSocketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-                registry.register(new Scheme("https", sslSocketFactory, 443));
-                registry.register(new Scheme("https", sslSocketFactory, 8448));
-                ThreadSafeClientConnManager clientConnManager = new ThreadSafeClientConnManager(params, registry);
+//                HttpParams params = new BasicHttpParams();
+//                SchemeRegistry registry = new SchemeRegistry();
+//                registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+
+
+                org.apache.http.conn.ssl.SSLSocketFactory sf = (org.apache.http.conn.ssl.SSLSocketFactory) httpClient.getConnectionManager()
+                        .getSchemeRegistry().getScheme("https").getSocketFactory();
+                sf.setHostnameVerifier(new AllowAllHostnameVerifier());
+
+//                SchemeRegistry schemeRegistry = new SchemeRegistry();
+//                registry.register(new Scheme("https", 8443, sslSf));
+//                registry.register(new Scheme("https", 443, sslSf));
+
+//                SSLSocketFactory sslSocketFactory = SSLSocketFactory.getSocketFactory();
+//                // ホスト名の検証を行わない。
+//                sslSocketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+//                registry.register(new Scheme("https", sslSocketFactory, 443));
+//                registry.register(new Scheme("https", sslSocketFactory, 8448));
+
+//                ThreadSafeClientConnManager clientConnManager = new ThreadSafeClientConnManager(params, registry);
 //                HttpClient httpClient = new DefaultHttpClient(clientConnManager , params);
-                DefaultHttpClient client = new DefaultHttpClient(clientConnManager , params);
+//                DefaultHttpClient client = new DefaultHttpClient(clientConnManager , params);
 
                 HttpPost post = new HttpPost(urlSt);
 
@@ -272,23 +289,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 entity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
                 post.setEntity(entity);
                 try {
-                    response = client.execute(post);
+                    response = httpClient.execute(post);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                Log.d("VOICE", urlSt);
+                Log.d("GEO", urlSt);
 
                 return null;
             }
 
             @Override
             protected void onPostExecute(Void result) {
-//                Log.d("VOICE", retText);
                 if (response != null) {
-                    Log.d("VOICE", response.toString());
+                    Log.d("GEO", response.toString());
                 } else {
-                    Log.d("VOICE", "null!!!");
+                    Log.d("GEO", "null!!!");
                 }
             }
         };
@@ -306,10 +322,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             ArrayList<String> results = data.getStringArrayListExtra(
                     RecognizerIntent.EXTRA_RESULTS);
 
-            for (int i = 0; i< results.size(); i++) {
-                // ここでは、文字列が複数あった場合に結合しています
-                resultsString += results.get(i);
-            }
+//            for (int i = 0; i< results.size(); i++) {
+//                // ここでは、文字列が複数あった場合に結合しています
+//                resultsString += results.get(i);
+//            }
 
             res = results.get(0);
 
@@ -321,15 +337,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Translate.setClientId("tad2016");
                     Translate.setClientSecret("n+c88QCb5WqsID86yHC0tFK5Wtr5vlBeXBxYTJRxn9k=");
 
-
-
                     try {
                         translatedText = Translate.execute(res, Language.JAPANESE, Language.ENGLISH);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
-
 
                     return null;
                 }
@@ -345,7 +357,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Speak.setClientId("tad2016");
                             Speak.setClientSecret("n+c88QCb5WqsID86yHC0tFK5Wtr5vlBeXBxYTJRxn9k=");
 
-
                             try {
                                 url = Speak.execute(translatedText, SpokenDialect.ENGLISH_UNITED_KINGDOM);
                             } catch (Exception e) {
@@ -358,7 +369,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         protected void onPostExecute(Void result){
 //                            Log.d("VOICE", url);
                             //リソースファイルから再生
-
                             MediaPlayer mediaPlayer = new MediaPlayer();
                             try {
                                 mediaPlayer.setDataSource(url);
@@ -382,14 +392,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
             // トーストを使って結果を表示
-            Toast.makeText(this, resultsString, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, res, Toast.LENGTH_LONG).show();
 //            Toast.makeText(this, translatedText, Toast.LENGTH_LONG).show();
         }
 
         super.onActivityResult(requestCode, resultCode, data);
     }
-
-    private static final int REQUEST_CODE = 0;
 
     /**
      * Media connecting to remote peer.
