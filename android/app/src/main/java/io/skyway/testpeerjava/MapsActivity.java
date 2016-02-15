@@ -4,17 +4,13 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationManager;
 import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.util.AndroidRuntimeException;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,43 +22,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.apache.http.HttpResponse;
-//import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-//import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
-import org.apache.http.entity.AbstractHttpEntity;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,12 +48,16 @@ import com.memetix.mst.language.Language;
 import com.memetix.mst.language.SpokenDialect;
 import com.memetix.mst.speak.Speak;
 import com.memetix.mst.translate.Translate;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-//import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -96,6 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
 //    private LocationSourceImpl mLocationSource = null;
+    LatLng curr = new LatLng(35.658581,139.745433);
     private boolean mDoFollow = true;
 
     private static final String TAG = MapsActivity.class.getSimpleName();
@@ -236,73 +206,95 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         _msLocal.switchCamera();
     }
 
+    private static OkHttpClient getUnsafeOkHttpClient() {
+        try {
+            // Create a trust manager that does not validate certificate chains
+            final TrustManager[] trustAllCerts = new TrustManager[] {
+                    new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws java.security.cert.CertificateException {
+
+                        }
+
+                        @Override
+                        public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws java.security.cert.CertificateException {
+
+                        }
+
+                        @Override
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+                    }
+            };
+
+            // Install the all-trusting trust manager
+            final SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+            // Create an ssl socket factory with our all-trusting manager
+            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+            OkHttpClient okHttpClient = new OkHttpClient();
+            okHttpClient.setSslSocketFactory(sslSocketFactory);
+            okHttpClient.setHostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+            return okHttpClient;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String post(String url, String json) throws IOException {
+        OkHttpClient client = getUnsafeOkHttpClient();
+        final MediaType JSON
+                = MediaType.parse("application/json; charset=utf-8");
+        RequestBody body = RequestBody.create(JSON, json);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        Response response = null;
+        try {
+            response = client.newCall(request).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return response.body().string();
+    }
+
     private void sendGeo() {
-        LatLng tokyo = new LatLng(35.658581,139.745433);
 
         AsyncTask<Void, Void, Void> task0 = new AsyncTask<Void, Void, Void>() {
-            HttpResponse response = null;
+            String response = null;
             @Override
             protected Void doInBackground(Void... paramss) {
 
-                HttpURLConnection con = null;
-//                URL url = null;
-                String urlSt = "https://20151121ubuntu.cloudapp.net:8448/_matrix/client/api/v1/rooms/!kMPhYGcwRkJvDklDdp:20151121ubuntu.cloudapp.net/send/m.room.message?access_token=MDAyOWxvY2F0aW9uIDIwMTUxMTIxdWJ1bnR1LmNsb3VkYXBwLm5ldAowMDEzaWRlbnRpZmllciBrZXkKMDAxMGNpZCBnZW4gPSAxCjAwM2ZjaWQgdXNlcl9pZCA9IEB0YWRoYWNrMjAxNnRlc3Q6MjAxNTExMjF1YnVudHUuY2xvdWRhcHAubmV0CjAwMTZjaWQgdHlwZSA9IGFjY2VzcwowMDFkY2lkIHRpbWUgPCAxNDU1NDI2NDI4NjY3CjAwMmZzaWduYXR1cmUgxr3YWKsR6zD0M_JqHz5FIyb_0O24r5HRmr0krYH3wHQK";
+                String url = "https://20151121ubuntu.cloudapp.net:8448/_matrix/client/api/v1/rooms/!kMPhYGcwRkJvDklDdp:20151121ubuntu.cloudapp.net/send/m.room.message?access_token=MDAyOWxvY2F0aW9uIDIwMTUxMTIxdWJ1bnR1LmNsb3VkYXBwLm5ldAowMDEzaWRlbnRpZmllciBrZXkKMDAxMGNpZCBnZW4gPSAxCjAwM2ZjaWQgdXNlcl9pZCA9IEB0YWRoYWNrMjAxNnRlc3Q6MjAxNTExMjF1YnVudHUuY2xvdWRhcHAubmV0CjAwMTZjaWQgdHlwZSA9IGFjY2VzcwowMDFkY2lkIHRpbWUgPCAxNDU1NDI2NDI4NjY3CjAwMmZzaWduYXR1cmUgxr3YWKsR6zD0M_JqHz5FIyb_0O24r5HRmr0krYH3wHQK";
 
                 Map<String, Object> jsonValues = new HashMap<>();
                 jsonValues.put("msgtype", "m.text");
-                jsonValues.put("body", "100");
-                JSONObject json = new JSONObject(jsonValues);
+                jsonValues.put("body", curr.toString());
+                String json = new JSONObject(jsonValues).toString();
 
-                DefaultHttpClient httpClient = new DefaultHttpClient();
-
-//                HttpParams params = new BasicHttpParams();
-//                SchemeRegistry registry = new SchemeRegistry();
-//                registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-
-
-                org.apache.http.conn.ssl.SSLSocketFactory sf = (org.apache.http.conn.ssl.SSLSocketFactory) httpClient.getConnectionManager()
-                        .getSchemeRegistry().getScheme("https").getSocketFactory();
-                sf.setHostnameVerifier(new AllowAllHostnameVerifier());
-
-//                SchemeRegistry schemeRegistry = new SchemeRegistry();
-//                registry.register(new Scheme("https", 8443, sslSf));
-//                registry.register(new Scheme("https", 443, sslSf));
-
-//                SSLSocketFactory sslSocketFactory = SSLSocketFactory.getSocketFactory();
-//                // ホスト名の検証を行わない。
-//                sslSocketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-//                registry.register(new Scheme("https", sslSocketFactory, 443));
-//                registry.register(new Scheme("https", sslSocketFactory, 8448));
-
-//                ThreadSafeClientConnManager clientConnManager = new ThreadSafeClientConnManager(params, registry);
-//                HttpClient httpClient = new DefaultHttpClient(clientConnManager , params);
-//                DefaultHttpClient client = new DefaultHttpClient(clientConnManager , params);
-
-                HttpPost post = new HttpPost(urlSt);
-
-                AbstractHttpEntity entity = null;
                 try {
-                    entity = new ByteArrayEntity(json.toString().getBytes("UTF8"));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-                entity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-                post.setEntity(entity);
-                try {
-                    response = httpClient.execute(post);
+                    response = post(url, json);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                Log.d("GEO", urlSt);
+                Log.d("GEO", curr.toString());
 
                 return null;
             }
 
             @Override
             protected void onPostExecute(Void result) {
-                if (response != null) {
-                    Log.d("GEO", response.toString());
+                if (response != "") {
+                    Log.d("GEO", response);
                 } else {
                     Log.d("GEO", "null!!!");
                 }
@@ -825,7 +817,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location loc) {
-                LatLng curr = new LatLng(loc.getLatitude(), loc.getLongitude());
+                curr = new LatLng(loc.getLatitude(), loc.getLongitude());
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(curr));
                 //Google Mapの Zoom値を指定
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
