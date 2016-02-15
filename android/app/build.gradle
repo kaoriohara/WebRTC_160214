@@ -1,10 +1,8 @@
 apply plugin: 'com.android.application'
 
-
-
 repositories {
     mavenLocal()
-//	mavenCentral()
+	mavenCentral()
 }
 
 android {
@@ -34,8 +32,11 @@ dependencies {
     compile 'org.msgpack:msgpack-core:0.7.1'
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.google.android.gms:play-services:8.1.0'
+//    compile 'com.squareup.okhttp:okhttp:2.5.0'
+//    compile 'com.squareup.okio:okio:1.6.0'
     compile files('../lib/microsoft-translator-java-api-0.6.2-jar-with-dependencies.jar')
-    compile 'com.squareup.okhttp:okhttp:2.5.0'
+    compile files('../lib/okhttp-2.5.0.jar')
+    compile files('../lib/okio-1.6.0.jar')
 }
 
 repositories {
