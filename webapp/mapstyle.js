@@ -8,7 +8,7 @@ function initialize() {
   var map = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
 
   set_map_options(map, currentPos);
-  matrix_call_chunk();
+  setTimeout(matrix_call_chunk(),3000);
 }
 
 function set_map_options(map, currentPos){

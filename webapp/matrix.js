@@ -15,14 +15,16 @@ function matrix_call() {
   var url = "https://20151121ubuntu.cloudapp.net:8448/_matrix/client/api/v1/events?access_token=MDAyOWxvY2F0aW9uIDIwMTUxMTIxdWJ1bnR1LmNsb3VkYXBwLm5ldAowMDEzaWRlbnRpZmllciBrZXkKMDAxMGNpZCBnZW4gPSAxCjAwM2ZjaWQgdXNlcl9pZCA9IEB0YWRoYWNrMjAxNnRlc3Q6MjAxNTExMjF1YnVudHUuY2xvdWRhcHAubmV0CjAwMTZjaWQgdHlwZSA9IGFjY2VzcwowMDFkY2lkIHRpbWUgPCAxNDU1NDI2NDI4NjY3CjAwMmZzaWduYXR1cmUgxr3YWKsR6zD0M_JqHz5FIyb_0O24r5HRmr0krYH3wHQK";
   $.getJSON(url, function(json){
     // alert("JSON Data: " + json.end);
-    matrix_call_text(json.end);
+    matrix_call_text(json.start);
+
   });
 }
 
-function matrix_call_chunk(end) {
-  var test = "s53_117_10_2_1"
+function matrix_call_chunk(time) {
+  var from_test = "s65_178_10_2_1";
+  var to_test = "s66_185_10_2_1";
   var url = "https://20151121ubuntu.cloudapp.net:8448/_matrix/client/api/v1/events?access_token=MDAyOWxvY2F0aW9uIDIwMTUxMTIxdWJ1bnR1LmNsb3VkYXBwLm5ldAowMDEzaWRlbnRpZmllciBrZXkKMDAxMGNpZCBnZW4gPSAxCjAwM2ZjaWQgdXNlcl9pZCA9IEB0YWRoYWNrMjAxNnRlc3Q6MjAxNTExMjF1YnVudHUuY2xvdWRhcHAubmV0CjAwMTZjaWQgdHlwZSA9IGFjY2VzcwowMDFkY2lkIHRpbWUgPCAxNDU1NDI2NDI4NjY3CjAwMmZzaWduYXR1cmUgxr3YWKsR6zD0M_JqHz5FIyb_0O24r5HRmr0krYH3wHQK";
-  $.getJSON(url+"&from="+test, function(json){
+  $.getJSON(url+"&from="+from_test, function(json){
     // alert("JSON Data: " + json.chunk[0].content.body);
     console.log(json.chunk);
     console.log(json.chunk[2].content.body);
