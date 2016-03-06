@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
@@ -168,10 +169,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 try {
                     // インテント作成
                     Intent intent = new Intent(
-                            RecognizerIntent.ACTION_RECOGNIZE_SPEECH); // ACTION_WEB_SEARCH
+                            RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                     intent.putExtra(
                             RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+
                             RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.ENGLISH.toString() );
                     intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
                     intent.putExtra(
                             RecognizerIntent.EXTRA_PROMPT,
@@ -328,7 +331,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Translate.setClientSecret("n+c88QCb5WqsID86yHC0tFK5Wtr5vlBeXBxYTJRxn9k=");
 
                     try {
-                        translatedText = Translate.execute(res, Language.JAPANESE, Language.ENGLISH);
+//                        translatedText = Translate.execute(res, Language.JAPANESE, Language.ENGLISH);
+                        translatedText = Translate.execute(res, Language.ENGLISH, Language.JAPANESE);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -348,7 +352,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Speak.setClientSecret("n+c88QCb5WqsID86yHC0tFK5Wtr5vlBeXBxYTJRxn9k=");
 
                             try {
-                                url = Speak.execute(translatedText, SpokenDialect.ENGLISH_UNITED_KINGDOM);
+//                                url = Speak.execute(translatedText, SpokenDialect.ENGLISH_UNITED_KINGDOM);
+                                url = Speak.execute(translatedText, SpokenDialect.JAPANESE_JAPAN);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

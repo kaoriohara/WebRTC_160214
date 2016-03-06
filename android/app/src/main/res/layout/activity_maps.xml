@@ -89,14 +89,12 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-
                 android:id="@+id/btnVoice"
                 android:background="@drawable/btn02_02_sp"
                 android:enabled="false"/>
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-
                 android:id="@+id/btnVoiceStop"
                 android:background="@drawable/btn02_03_sp"
                 android:enabled="false"/>
@@ -118,10 +116,7 @@
                 android:layout_height="match_parent"
                 android:id="@+id/svSecondary"/>
 
-
-
         </LinearLayout>
-
 
     </LinearLayout>
 
